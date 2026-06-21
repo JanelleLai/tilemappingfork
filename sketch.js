@@ -243,7 +243,7 @@ function drawTiles() {
       fill("white");
     } else if (t.id === "2") {
       fill("yellow");
-      } else if (t.id === "3") {
+      } else if (t.id === "3") { // for the real json file
       fill("orange");
       } else if (t.id === "4") {
       fill("red");
