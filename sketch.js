@@ -16,14 +16,8 @@
 //   data/obstacles.json — obstacle positions in world coordinates
 // ============================================================
 
-// ------------------------------------------------------------
-// WORLD
-// The world is larger than the canvas. The camera follows
-// the player so only part of the world is visible at once.
-// ------------------------------------------------------------
-const TILE_SIZE = 50;
-const WORLD_W = TILE_SIZE * 303; // total world width in pixels
-const WORLD_H = TILE_SIZE * 44; // total world height in pixels
+let WORLD_W; // total world width in pixels
+let WORLD_H; // total world height in pixels
 
 // ------------------------------------------------------------
 // CAMERA
@@ -89,14 +83,6 @@ let enemyData;
 let nextWave = 0;
 
 // ------------------------------------------------------------
-// BOSS
-// Spawns when player enters the boss zone (player.y < bossZoneY).
-// ------------------------------------------------------------
-let boss = null;
-let bossData = null;
-const BOSS_ZONE_Y = 300; // world Y — enter this zone to trigger boss
-
-// ------------------------------------------------------------
 // MINIMAP
 // Drawn in screen coordinates after pop().
 // Shows a scaled-down version of the world with dots for
@@ -147,14 +133,20 @@ function preload() {
   // music          = loadSound("assets/sounds/music.mp3");
 }
 
+// ------------------------------------------------------------
+// WORLD
+// The world is larger than the canvas. The camera follows
+// the player so only part of the world is visible at once.
+// ------------------------------------------------------------
+const TILE_SIZE = 50;
+
 // ============================================================
 // setup()
 // ============================================================
 function setup() {
   createCanvas(800, 450);
-  bossData = enemyData.boss;
-  console.log("tileData=", tileData);
-  console.log("obstacleData=", obstacleData);
+  WORLD_W = TILE_SIZE * tileData.mapWidth; // total world width in pixels
+  WORLD_H = TILE_SIZE * tileData.mapHeight; // total world height in pixels
 
   // Build obstacle objects from JSON
   for (let i = 0; i < obstacleData.obstacles.length; i++) {
@@ -186,7 +178,8 @@ function draw() {
 
   // Everything inside push/pop is drawn in world coordinates
   push();
-  translate(width / 2, height / 2); scale(camZoom);  // translate to centre and scale the world translate
+  translate(width / 2, height / 2);
+  scale(camZoom); // translate to centre and scale the world translate
   translate(-width / 2, -height / 2); // then translate the world by camera top-left in world pixels
   translate(-camX, -camY);
 
@@ -200,15 +193,7 @@ function draw() {
     drawTiles();
 
     drawPlayer();
-  } else if (gameState === STATE_BOSS) {
-    handleInput();
-    applyBounce();
-
-    drawObstacles();
-    drawTiles();
-
-    drawPlayer();
-  }
+  } 
 
   pop(); // restore screen coordinates
 
@@ -236,9 +221,19 @@ function updateCamera() {
 
 function drawTiles() {
   const layers = tileData.layers; // there are 2 layers for now
-  for (let l = layers.length - 1; l > -1; l--) { // for each layer
+  for (let l = layers.length - 1; l > -1; l--) {
+    // for each layer
     for (let i = 0; i < layers[l].tiles.length; i++) {
       let t = layers[l].tiles[i];
+
+      if (
+        // skip if offscreen
+        t.x + t.size < camX ||
+        t.x - t.size > camX + width ||
+        t.y + t.size < camY ||
+        t.y - t.size > camY + height
+      )
+        continue;
 
       push();
 
@@ -250,9 +245,11 @@ function drawTiles() {
         fill("light blue"); // spike 2
       } else if (t.id === "2") {
         fill("purple"); // spike 3
-      } else if (t.id === "3") { // for the real json file
+      } else if (t.id === "3") {
+        // for the real json file
         fill("orange"); // spike 4
-      } else if (t.id === "4") { // key
+      } else if (t.id === "4") {
+        // key
         fill("yellow");
       } else if (t.id === "5") {
         fill(0); // rock
@@ -262,7 +259,7 @@ function drawTiles() {
         fill("blue"); // water top
       } else if (t.id === "8") {
         fill(80, 80, 100); // cave bg
-      } else if (t.id === "9") { 
+      } else if (t.id === "9") {
         fill(200, 240, 255); //background sky
       } else if (t.id === "10") {
         fill("pink");
@@ -386,8 +383,6 @@ function applyBounce() {
 // Draws background shapes in world coordinates.
 // ------------------------------------------------------------
 function drawBackground() {
-  noStroke();
-
   // World boundary outline
   noFill();
   stroke(60, 50, 80);
@@ -423,7 +418,6 @@ function handleInput() {
   // Keep player inside world bounds
   player.x = constrain(player.x, player.r, WORLD_W - player.r);
   player.y = constrain(player.y, player.r, WORLD_H - player.r);
-
 }
 
 // ------------------------------------------------------------
