@@ -120,8 +120,9 @@ let gameState = STATE_PLAY;
 function preload() {
   enemyData = loadJSON("data/enemies.json");
   obstacleData = loadJSON("data/obstacles.json");
-  tileData = loadJSON("data/map.json");
+  tileData = loadJSON("data/map.json"); // fix naming convention
   fishArea = loadJSON("data/fisharea.json");
+  // humanArea 
 
   // Uncomment to load sounds:
   // shootSound     = loadSound("assets/sounds/shoot.wav");
@@ -167,7 +168,7 @@ function setup() {
 // ============================================================
 function draw() {
   background(20);
-  console.log(player.x / 50, player.y / 50);
+  print("player x: " + player.x / 50 + ", player y: " + player.y / 50);
 
   updateCamera();
 
@@ -180,11 +181,11 @@ function draw() {
 
   drawBackground();
 
-  // if player 3/4 into bird area
+  // if player 3/4 into bird area - IT DRAWS IT, NOT LOADS which can be fixed later
   if (player.x > ((TILE_SIZE * tileData.mapWidth) / 4) * 3) {
     // add end of fish area boundary later
     drawTiles(fishArea); // fish area
-    console.log("fish area drawn");
+    console.log("fish area drawn"); 
   }
 
   if (gameState === STATE_PLAY) {
@@ -253,7 +254,7 @@ function drawTiles(jsonFile) {
       let t = layers[l].tiles[i]; // for every tile we will....
 
       if (
-        // skip drawing if offscreen
+        // skip drawing if offscreen - this is broken lowk
         t.x + t.size < camX ||
         t.x - t.size > camX + width ||
         t.y + t.size < camY ||
