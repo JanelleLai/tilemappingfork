@@ -65,13 +65,13 @@ const BIRD_SPRITE = {
   },
 };
 
-const GRAVITY = 3.0; // Calibrated downward pull
-const FLAP_FORCE = -24; // Gives the exact velocity curve to hit 3 blocks high
+const GRAVITY = 0.4; // 4.0  Calibrated downward pull
+const FLAP_FORCE = -4; // -24 // Gives the exact velocity curve to hit 3 blocks high
 const TERMINAL_VELOCITY = 20;
 
 let player = {
-  x: 15000,
-  y: 3000,
+  x: 0,
+  y: 0,
   r: 22,
 
   // Animation state variables
@@ -204,7 +204,9 @@ let gameState = STATE_PLAY;
 function preload() {
   enemyData = loadJSON("data/enemies.json");
   obstacleData = loadJSON("data/obstacles.json");
-  tileData = loadJSON("data/map.json");
+
+  startArea = loadJSON("data/startarea.json");
+  birdArea = loadJSON("data/birdarea.json");
   fishArea = loadJSON("data/fisharea.json");
 
   fishSheet = loadImage("assets/fish.png");
@@ -237,10 +239,10 @@ const TILE_SIZE = 50;
 // ============================================================
 function setup() {
   createCanvas(800, 450);
-  WORLD_W = TILE_SIZE * (tileData.mapWidth + fishArea.mapWidth); // total world width in pixels
-  WORLD_H = TILE_SIZE * (tileData.mapHeight + fishArea.mapHeight); // total world height in pixels
+  WORLD_W = TILE_SIZE * (birdArea.mapWidth + fishArea.mapWidth); // total world width in pixels
+  WORLD_H = TILE_SIZE * (birdArea.mapHeight + fishArea.mapHeight); // total world height in pixels
   bossData = enemyData.boss;
-  console.log("tileData=", tileData);
+  console.log("birdArea=", birdArea);
   console.log("obstacleData=", obstacleData);
 
   FISH_SPRITE.frameWidth = fishSheet.width / 2;
@@ -897,7 +899,12 @@ function drawTiles(jsonFile) {
       push();
       let mapXOffset = 0;
       let mapYOffset = 0;
+
       if (jsonFile == fishArea) {
+        mapXOffset = TILE_SIZE * (tileData.mapWidth - 33);
+        mapYOffset = TILE_SIZE * tileData.mapHeight;
+      }
+      if (jsonFile == birdArea) {
         mapXOffset = TILE_SIZE * (tileData.mapWidth - 33);
         mapYOffset = TILE_SIZE * tileData.mapHeight;
       }
