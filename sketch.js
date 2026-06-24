@@ -94,6 +94,7 @@ const TILE_SIZE = 50;
 let player = {
   x: 2 * TILE_SIZE,
   y: 2 * TILE_SIZE,
+  vy: 1,
   r: 15,
 
   // Animation state variables
